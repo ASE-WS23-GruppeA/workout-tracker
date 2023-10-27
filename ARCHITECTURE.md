@@ -15,81 +15,76 @@
 
 ## System Overview
 
-The Workout Tracker Web Application is designed as a distributed system, consisting of multiple microservices and a
+The **Workout Tracker** Web Application is designed as a distributed system, consisting of multiple microservices and a
 front-end client application. These components are developed using [Angular](https://angular.io/) for the front-end and
-[Spring](https://spring.io/) and [Express](https://expressjs.com/) for the back-end microservices.
+[Spring](https://spring.io/) and [Express](https://expressjs.com/)
+for the back-end microservices.
 
-![Microservices Architecture Diagram](assets/ms-architecture.drawio.svg)
+---
+
+## Front-end Architecture
+
+The front-end is built using [Angular](https://angular.io/). It interacts with the microservices through HTTP APIs and
+updates the UI accordingly. It's also responsible for client-side routing and state management.
 
 ---
 
 ## Microservices Architecture
 
-The microservices communicate synchronously via RESTful APIs over HTTP specified
-with . The system is divided into the following microservices:
+This project includes two architectures: _MVP_ and _Optional_.
+The _MVP_ architecture includes the base features of the project, the _Optional_ architecture extends the MVP with the
+addition of message queues in the form of [RabbitMQ](https://www.rabbitmq.com/) which will be predominantly used by the
+newly added Notification and Achievement services.
 
-### API Gateway
+### MVP Architecture
 
-- **Responsibilities**: Acts as a single entry point for all client requests and routes them to the appropriate
-  microservice.
-- **Tech Stack**: Java, Spring, Spring Cloud Gateway
+![Microservices Architecture Diagram](assets/ms-architecture-mvp.svg)
 
-### User Service
+#### API Gateway
 
-- **Responsibilities**: Handles user registration, login, logout, and user profile management.
-- **Tech Stack**: Java, Spring, PostgreSQL
+- **Responsibilities**: Acts as a single entry point for all client requests. The requests are authenticated and if
+  authorized routed to the appropriate microservice.
+- **Tech Stack**:
+  Java, [Spring](https://spring.io/), [Spring Cloud Gateway](https://spring.io/projects/spring-cloud-gateway)
 
-### Workout Service
+#### User Service
 
-- **Responsibilities**: Manages the creation, updating, and deletion of workouts, including adding exercises to a
-  workout.
-- **Tech Stack**: Java, Spring, PostgreSQL
+- **Responsibilities**: Handles user creation and user profile management in general
+  with [Keycloak](https://www.keycloak.org/). It also tracks personal information of the user and user-specific
+  measurements.
+- **Tech Stack**: Java, [Spring](https://spring.io/), [PostgreSQL](https://www.postgresql.org/)
 
-### Exercise Service
+#### Workout Service
 
-- **Responsibilities**: Manages the creation, updating, and deletion of exercises.
-- **Tech Stack**: Java, Spring, PostgreSQL
+- **Responsibilities**: Manages the CRUD operations for workouts, including adding exercises to a workout. It also
+  handles the progress-tracking for the workouts and exercises per user.
+- **Tech Stack**: NodeJS, [Express](https://expressjs.com/), [PostgreSQL](https://www.postgresql.org/)
 
-### Progress Tracking Service
+#### Exercise Service
 
-- **Responsibilities**: Tracks and stores user progress, including completed workouts and body measures.
-- **Tech Stack**: Java, Spring, PostgreSQL
+- **Responsibilities**: Manages the CRUD operations for exercises.
+- **Tech Stack**: NodeJS, [Express](https://expressjs.com/), [PostgreSQL](https://www.postgresql.org/)
 
-### Analytics Service
+#### Analytics Service
 
 - **Responsibilities**: Analyzes user progress data to provide insights and visualizations.
-- **Tech Stack**: NodeJS, Express
+- **Tech Stack**: Java, [Spring](https://spring.io/)
 
-### Notification Service
+### Optional Architecture
 
-- **Responsibilities**: Sends notifications to users about achievements, milestones, and reminders.
-- **Tech Stack**: Java, Spring, RabbitMQ
+![Microservices Architecture Diagram](assets/ms-architecture-optional.svg)
 
----
+#### Notification Service
 
-## Database Strategy
+- **Responsibilities**: Listens to notification event from other services and sends notifications to users about
+  completed actions (user creation, workout completion, ...), achievements, and milestones.
+- **Tech Stack**: Java, [Spring](https://spring.io/), [PostgreSQL](https://www.postgresql.org/)
 
-We adopt a **Database per Service** strategy, where each microservice has its own dedicated database. This ensures loose
-coupling and high cohesion among the services. PostgreSQL is the chosen database technology for most of the services due
-to its robustness, feature set, and compatibility with Java Spring.
+#### Achievement Service
 
-### Data Synchronization
-
-Data synchronization across services is managed through an event-driven architecture using RabbitMQ. When a significant
-event occurs in one service, it publishes an event message to a RabbitMQ queue. Other services that depend on this data
-subscribe to the relevant queues and update their local databases or caches accordingly.
-
-#### Examples:
-
-- **Workout Completion**: When a user completes a workout, the "Progress Tracking Service" updates its database and
-  sends a "WorkoutCompleted" event. The "Analytics Service" is subscribed to this event. Upon receiving it, the service
-  updates its local database and may recalculate aggregated metrics.
-
-- **User Registration**: On a new user registration, the "User Service" would publish a "UserRegistered" event. Services
-  like "Analytics Service" may initialize a new profile for analytics based on this event.
-
-By using this strategy, we ensure that each service can operate independently and that the system can easily scale both
-horizontally and vertically.
+- **Responsibilities**: Tracks the user's progress for predefined achievements and milestones by listening to events
+  from the other services. When a milestone is reached, it pushes a notification event into the queue.
+- **Tech Stack**: Java, [Spring](https://spring.io/), [PostgreSQL](https://www.postgresql.org/)
 
 ---
 
@@ -104,22 +99,42 @@ allow an event-driven architecture.
 
 ## Authentication and Authorization
 
-- **Provider**: OAuth2 authentication is done with Keycloak as the Identity Provider.
-- **Backend**: Spring Security is used for handling authorization on the backend. Upon successful authentication, a JWT
-  token is issued and sent back to the frontend.
+- **Provider**: [OAuth2](https://oauth.net/2/) authentication is done with [Keycloak](https://www.keycloak.org/) as the
+  Identity Provider.
+- **Backend**: [Spring Security](https://spring.io/projects/spring-security) is used for handling authorization on the
+  backend. Upon successful authentication, a JWT token is issued and sent back to the frontend.
 - **Frontend**: Angular uses the Keycloak JS Adapter for managing OAuth2 tokens.
 - **Token Storage**: JWTs are stored in HttpOnly cookies to mitigate the risk of XSS attacks.
-- **API Gateway**: Spring Cloud Gateway acts as a filtering layer, enforcing access controls before requests hit the
+- **API Gateway**: [Spring](https://spring.io/) Cloud Gateway acts as a filtering layer, enforcing access controls
+  before requests hit the
   individual microservices.
 
-This setup ensures a robust, secure, and centralized authentication system suitable for a microservices architecture.
+This setup ensures a robust, secure, and centralized authentication system suitable for a microservice architecture.
 
 ---
 
-## Front-end Architecture
+## Monitoring and Logging
 
-The front-end is built using Angular. It interacts with the microservices through HTTP APIs and updates the UI
-accordingly. It's also responsible for client-side routing and state management.
+Basic monitoring is implemented with [Spring Boot Actuator](), [Prometheus](https://prometheus.io/)
+and [Grafana](https://grafana.com/). Logging implemented
+using [Log4J](https://logging.apache.org/log4j/2.x/) and the [ELK-Stack](https://www.elastic.co/de/elastic-stack) is
+used for log aggregation.
+
+---
+
+## Database Strategy
+
+We adopt a **Database per Service** strategy, where each microservice has its own dedicated database. This ensures loose
+coupling and high cohesion among the services. [PostgreSQL](https://www.postgresql.org/) is the chosen database
+technology for most of the services due to its robustness, feature set, and popularity. Furthermore, the data schema for
+our services is known beforehand with the requirement for complex queries, which lends itself well to using a relational
+DB.
+
+### Database Schema Overview
+
+#### Workout-Exercise Schema
+
+![Data Model](assets/erd-workout.svg)
 
 ---
 
@@ -128,9 +143,4 @@ accordingly. It's also responsible for client-side routing and state management.
 Given the aim for cost-effectiveness, all microservices and the front-end application are planned to be deployed on a
 single DigitalOcean Droplet. Each component is containerized using Docker for easier deployment and management.
 
----
 
-## Monitoring and Logging
-
-Basic monitoring and logging are implemented using Spring Boot’s Actuator and logging capabilities. Metrics are exposed
-via endpoints and can be collected for future monitoring solutions.
