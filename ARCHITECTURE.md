@@ -49,10 +49,10 @@ newly added Notification and Achievement services.
 
 #### User Service
 
-- **Responsibilities**: Handles user creation and user profile management in general
-  with [Keycloak](https://www.keycloak.org/). It also tracks personal information of the user and user-specific
-  measurements.
-- **Tech Stack**: Java, [Spring](https://spring.io/), [PostgreSQL](https://www.postgresql.org/)
+- **Responsibilities**: Handles user registration, login and user profile management. It also tracks personal
+  information of the user and user-specific measurements.
+- **Tech Stack**:
+  Java, [Spring Security](https://spring.io/projects/spring-security), [PostgreSQL](https://www.postgresql.org/)
 
 #### Workout Service
 
@@ -97,22 +97,6 @@ allow an event-driven architecture.
 
 ---
 
-## Authentication and Authorization
-
-- **Provider**: [OAuth2](https://oauth.net/2/) authentication is done with [Keycloak](https://www.keycloak.org/) as the
-  Identity Provider.
-- **Backend**: [Spring Security](https://spring.io/projects/spring-security) is used for handling authorization on the
-  backend. Upon successful authentication, a JWT token is issued and sent back to the frontend.
-- **Frontend**: Angular uses the Keycloak JS Adapter for managing OAuth2 tokens.
-- **Token Storage**: JWTs are stored in HttpOnly cookies to mitigate the risk of XSS attacks.
-- **API Gateway**: [Spring](https://spring.io/) Cloud Gateway acts as a filtering layer, enforcing access controls
-  before requests hit the
-  individual microservices.
-
-This setup ensures a robust, secure, and centralized authentication system suitable for a microservice architecture.
-
----
-
 ## Monitoring and Logging
 
 Basic monitoring is implemented with [Spring Boot Actuator](), [Prometheus](https://prometheus.io/)
@@ -124,11 +108,11 @@ used for log aggregation.
 
 ## Database Strategy
 
-We adopt a **Database per Service** strategy, where each microservice has its own dedicated database. This ensures loose
-coupling and high cohesion among the services. [PostgreSQL](https://www.postgresql.org/) is the chosen database
-technology for most of the services due to its robustness, feature set, and popularity. Furthermore, the data schema for
-our services is known beforehand with the requirement for complex queries, which lends itself well to using a relational
-DB.
+We adopt a **[Database per Service](https://microservices.io/patterns/data/database-per-service.html)** strategy, where
+each microservice has its own dedicated database. This ensures loose coupling and high cohesion among the
+services. [PostgreSQL](https://www.postgresql.org/) is the chosen database technology for most of the services due to
+its robustness, feature set, and popularity. Furthermore, the data schema for our services is known beforehand with the
+requirement for complex queries, which lends itself well to using a relational DB.
 
 ### Database Schema Overview
 
@@ -141,6 +125,7 @@ DB.
 ## Deployment Strategy
 
 Given the aim for cost-effectiveness, all microservices and the front-end application are planned to be deployed on a
-single DigitalOcean Droplet. Each component is containerized using Docker for easier deployment and management.
+single [DigitalOcean Droplet](https://www.digitalocean.com/products/droplets). Each component is containerized using
+[Docker](https://www.docker.com/) for easier deployment and management.
 
 
