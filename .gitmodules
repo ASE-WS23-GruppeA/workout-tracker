@@ -1,7 +1,7 @@
 [submodule "microservices/frontend"]
 	path = microservices/frontend
 	url = https://github.com/ASE-WS23-GruppeA/frontend
-	branch = main
+	branch = feature/containerization
 [submodule "microservices/analytics-service"]
 	path = microservices/analytics-service
 	url = https://github.com/ASE-WS23-GruppeA/analytics-service
