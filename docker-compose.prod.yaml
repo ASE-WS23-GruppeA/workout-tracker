@@ -17,7 +17,7 @@ services:
       retries: 10
 
   auth-server:
-    build: microservices/authorization-server
+    image: registry.digitalocean.com/do-ase-registry/auth-server:latest
     environment:
       - SPRING_PROFILES_ACTIVE=docker
     healthcheck:
@@ -27,7 +27,7 @@ services:
       retries: 10
 
   api-gateway:
-    build: microservices/api-gateway
+    image: registry.digitalocean.com/do-ase-registry/api-gateway:latest
     environment:
       - SPRING_PROFILES_ACTIVE=docker
     healthcheck:
@@ -37,7 +37,7 @@ services:
       retries: 10
 
   user-service:
-    build: microservices/user-service
+    image: registry.digitalocean.com/do-ase-registry/user-service:latest
     environment:
       - SPRING_PROFILES_ACTIVE=docker
     depends_on:
@@ -50,7 +50,7 @@ services:
       retries: 10
 
   frontend:
-    build: microservices/frontend/FE_Fitness_Tracker
+    image: registry.digitalocean.com/do-ase-registry/frontend:latest
     ports:
       - "80:80"
     healthcheck:
