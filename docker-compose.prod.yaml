@@ -8,10 +8,7 @@ services:
       POSTGRES_USER: wt
       POSTGRES_PASSWORD: wt
       POSTGRES_DB: wt_user_service
-    ports:
-      - "5432:5432"
     volumes:
-      #      - ./db_data_volume:/var/lib/postgresql/data
       - ./microservices/user-service/init_scripts/01_ddl.sql:/docker-entrypoint-initdb.d/01_ddl.sql
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -q -U wt -d wt_user_service" ]
@@ -33,11 +30,6 @@ services:
     build: microservices/api-gateway
     environment:
       - SPRING_PROFILES_ACTIVE=docker
-    ports:
-      - "8443:8443"
-    depends_on:
-      auth-server:
-        condition: service_healthy
     healthcheck:
       test: [ "CMD", "curl", "-fs", "http://localhost:8443/actuator/health" ]
       interval: 5s
@@ -49,8 +41,6 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=docker
     depends_on:
-      api-gateway:
-        condition: service_healthy
       postgres_db:
         condition: service_healthy
     healthcheck:
@@ -63,9 +53,6 @@ services:
     build: microservices/frontend/FE_Fitness_Tracker
     ports:
       - "80:80"
-    depends_on:
-      user-service:
-        condition: service_healthy
     healthcheck:
       test: [ "CMD-SHELL", "curl -fs http://localhost:80" ]
       interval: 5s
