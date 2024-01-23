@@ -6,4 +6,10 @@ docker compose -f docker-compose.local.yaml down
 ./microservices/authorization-server/gradlew -p ./microservices/authorization-server/ clean assemble
 ./microservices/user-service/gradlew -p ./microservices/user-service/ clean assemble
 
+(
+  cd ./microservices/frontend/FE_Fitness_Tracker || exit
+  npm install
+  npm run build:prod
+)
+
 docker compose -f docker-compose.local.yaml up --build
