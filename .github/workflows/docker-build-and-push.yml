@@ -53,7 +53,7 @@ jobs:
 
       - name: Decode and Create .env File
         if: ${{ inputs.add_env_file }}
-        run: echo ${{ secrets.ENCODED_ENV_FILE }} | base64 -d > .env
+        run: echo "${{ secrets.ENCODED_ENV_FILE }}" | base64 -d > .env
 
       - name: Build Docker Image
         run: |
