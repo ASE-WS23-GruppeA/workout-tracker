@@ -9,7 +9,7 @@ on:
         required: true
 
 jobs:
-  restart:
+  restart-services-with-docker-compose:
     runs-on: ubuntu-latest
     steps:
       - name: Restart Services
