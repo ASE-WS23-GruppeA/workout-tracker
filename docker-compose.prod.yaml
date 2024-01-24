@@ -19,30 +19,12 @@ services:
   postgres-exercise-db:
     image: postgres:latest
     env_file:
-      - ./environments/.env.exercise
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -q -U $POSTGRES_USER -d $POSTGRES_DB" ]
-      interval: 5s
-      timeout: 2s
-      retries: 10
+      - ./exercise.env
 
   postgres-workout-db:
     image: postgres:latest
     env_file:
-      - ./environments/.env.workout
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -q -U $POSTGRES_USER -d $POSTGRES_DB" ]
-      interval: 5s
-      timeout: 2s
-      retries: 10
+      - ./workout.env
 
   auth-server:
     image: registry.digitalocean.com/do-ase-registry/auth-server:latest
@@ -79,20 +61,16 @@ services:
 
   exercise-service:
     image: registry.digitalocean.com/do-ase-registry/exercise-service:latest
-    env_file:
-      - ./environments/.env.exercise
     depends_on:
       postgres-exercise-db:
-        condition: service_healthy
+        condition: service_started
 
   exercise-service-data-initializer:
     image: registry.digitalocean.com/do-ase-registry/exercise-service-insertion:latest
-    env_file:
-      - ./environments/.env.exercise
     command: "sh -c 'npx prisma migrate deploy && node dataInsertion.js'"
     depends_on:
       postgres-exercise-db:
-        condition: service_healthy
+        condition: service_started
 
   #  workout-service:
   #    image: registry.digitalocean.com/do-ase-registry/workout-service:latest
