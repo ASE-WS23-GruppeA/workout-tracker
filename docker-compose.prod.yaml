@@ -20,11 +20,21 @@ services:
     image: postgres:latest
     env_file:
       - ./exercise.env
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -q" ]
+      interval: 5s
+      timeout: 10s
+      retries: 10
 
   postgres-workout-db:
     image: postgres:latest
     env_file:
       - ./workout.env
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -q" ]
+      interval: 5s
+      timeout: 10s
+      retries: 10
 
   auth-server:
     image: registry.digitalocean.com/do-ase-registry/auth-server:latest
@@ -63,22 +73,32 @@ services:
     image: registry.digitalocean.com/do-ase-registry/exercise-service:latest
     depends_on:
       postgres-exercise-db:
-        condition: service_started
+        condition: service_healthy
 
   exercise-service-data-initializer:
     image: registry.digitalocean.com/do-ase-registry/exercise-service-insertion:latest
     command: "sh -c 'npx prisma migrate deploy && node dataInsertion.js'"
     depends_on:
       postgres-exercise-db:
-        condition: service_started
+        condition: service_healthy
 
-  #  workout-service:
-  #    image: registry.digitalocean.com/do-ase-registry/workout-service:latest
-  #    env_file:
-  #      - ./environments/.env.workout
-  #    depends_on:
-  #      postgres-workout-db:
-  #        condition: service_healthy
+  workout-service:
+    image: registry.digitalocean.com/do-ase-registry/workout-service:latest
+    depends_on:
+      postgres-workout-db:
+        condition: service_healthy
+
+  workout-service-data-initializer:
+    image: registry.digitalocean.com/do-ase-registry/workout-service-insertion:latest
+    command: "sh -c 'npx prisma migrate deploy && node dataInsertion.js'"
+    depends_on:
+      postgres-workout-db:
+        condition: service_healthy
+
+  analytics-service:
+    image: registry.digitalocean.com/do-ase-registry/analytics-service:latest
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
 
   frontend:
     image: registry.digitalocean.com/do-ase-registry/frontend:latest
@@ -89,3 +109,6 @@ services:
       interval: 5s
       timeout: 2s
       retries: 10
+    depends_on:
+      postgres-user-db:
+        condition: service_healthy

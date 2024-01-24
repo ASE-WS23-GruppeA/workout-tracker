@@ -90,8 +90,6 @@ services:
     build:
       context: microservices/workout-service
       dockerfile: Dockerfile.app
-    ports:
-      - "3000:3000"
     depends_on:
       postgres-workout-db:
         condition: service_healthy
@@ -99,11 +97,16 @@ services:
   workout-service-data-initializer:
     build:
       context: microservices/workout-service
-      dockerfile: Dockerfile.migration
-    command: npx prisma migrate deploy
+      dockerfile: Dockerfile.insertion
+    command: "sh -c 'npx prisma migrate deploy && node dataInsertion.js'"
     depends_on:
       postgres-workout-db:
         condition: service_healthy
+
+  analytics-service:
+    build: microservices/analytics-service
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
 
   frontend:
     build: microservices/frontend/FE_Fitness_Tracker
@@ -114,3 +117,6 @@ services:
       interval: 5s
       timeout: 2s
       retries: 10
+    depends_on:
+      postgres-user-db:
+        condition: service_healthy
