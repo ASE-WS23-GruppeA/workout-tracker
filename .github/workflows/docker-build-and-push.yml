@@ -26,7 +26,6 @@ on:
 
 jobs:
   build-and-push-docker:
-    needs: build-and-test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout project sources
