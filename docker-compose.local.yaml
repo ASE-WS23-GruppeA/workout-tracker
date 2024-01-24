@@ -2,20 +2,38 @@ version: '3.8'
 
 services:
 
-  postgres_db:
+  postgres-user-db:
     image: postgres:16
     environment:
       POSTGRES_USER: wt
       POSTGRES_PASSWORD: wt
       POSTGRES_DB: wt_user_service
-    ports:
-      - "5432:5432"
     volumes:
       - ./microservices/user-service/init_scripts/01_ddl.sql:/docker-entrypoint-initdb.d/01_ddl.sql
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -q -U wt -d wt_user_service" ]
       interval: 5s
       timeout: 2s
+      retries: 10
+
+  postgres-exercise-db:
+    image: postgres:latest
+    env_file:
+      - ./microservices/exercise-service/.env
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -q" ]
+      interval: 5s
+      timeout: 10s
+      retries: 10
+
+  postgres-workout-db:
+    image: postgres:latest
+    env_file:
+      - ./microservices/workout-service/.env
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -q" ]
+      interval: 5s
+      timeout: 10s
       retries: 10
 
   auth-server:
@@ -32,8 +50,6 @@ services:
     build: microservices/api-gateway
     environment:
       - SPRING_PROFILES_ACTIVE=docker
-    ports:
-      - "8443:8443"
     healthcheck:
       test: [ "CMD", "curl", "-fs", "http://localhost:8443/actuator/health" ]
       interval: 5s
@@ -45,13 +61,49 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=docker
     depends_on:
-      postgres_db:
+      postgres-user-db:
         condition: service_healthy
     healthcheck:
       test: [ "CMD", "curl", "-fs", "http://localhost:8080/actuator/health" ]
       interval: 5s
       timeout: 2s
       retries: 10
+
+  exercise-service:
+    build:
+      context: microservices/exercise-service
+      dockerfile: Dockerfile.app
+    depends_on:
+      postgres-exercise-db:
+        condition: service_healthy
+
+  exercise-service-data-initializer:
+    build:
+      context: microservices/exercise-service
+      dockerfile: Dockerfile.insertion
+    command: "sh -c 'npx prisma migrate deploy && node dataInsertion.js'"
+    depends_on:
+      postgres-exercise-db:
+        condition: service_healthy
+
+  workout-service:
+    build:
+      context: microservices/workout-service
+      dockerfile: Dockerfile.app
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres-workout-db:
+        condition: service_healthy
+
+  workout-service-data-initializer:
+    build:
+      context: microservices/workout-service
+      dockerfile: Dockerfile.migration
+    command: npx prisma migrate deploy
+    depends_on:
+      postgres-workout-db:
+        condition: service_healthy
 
   frontend:
     build: microservices/frontend/FE_Fitness_Tracker
