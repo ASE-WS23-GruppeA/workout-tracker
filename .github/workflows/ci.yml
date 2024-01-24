@@ -21,5 +21,6 @@ jobs:
           source: "docker-compose.prod.yaml"
           target: "/root/docker-compose.yml"
 
-      - name: Restart application
-        uses: 2023-WS-ASE/workout-tracker/.github/workflows/docker-compose-restart.yml@main
+  restart-application:
+    needs: build-and-push-docker
+    uses: 2023-WS-ASE/workout-tracker/.github/workflows/docker-compose-restart.yml@main
