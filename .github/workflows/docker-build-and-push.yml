@@ -1,0 +1,52 @@
+name: Build and Push Docker Image
+
+on:
+  workflow_call:
+    inputs:
+      docker_image_tag:
+        required: true
+        type: string
+      build_artifact_name:
+        required: true
+        type: string
+      build_artifact_path:
+        required: true
+        type: string
+      docker_build_dockerfile_path:
+        required: false
+        type: string
+        default: 'Dockerfile'
+      docker_build_context_path:
+        required: false
+        type: string
+        default: '.'
+
+jobs:
+  build-and-push-docker:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout project sources
+        uses: actions/checkout@v4
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.build_artifact_name }}
+          path: ${{ inputs.build_artifact_path }}
+
+      - name: Build Docker Image
+        run: |
+          docker build -f ${{ inputs.docker_build_dockerfile_path }} -t ${{ inputs.docker_image_tag }} \
+            ${{ inputs.docker_build_context_path }}
+
+      - name: GitHub Action for DigitalOcean - doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+
+      - name: Log in to DigitalOcean Container Registry with short-lived credentials
+        run: doctl registry login --expiry-seconds 600
+
+      - name: Push image to DigitalOcean Container Registry
+        run: docker push ${{ inputs.docker_image_tag }}

@@ -1,0 +1,25 @@
+name: Update Docker Compose on Droplet
+
+on:
+  push:
+    paths:
+      - 'docker-compose.prod.yaml'
+
+jobs:
+  copy-docker-compose:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout project sources
+        uses: actions/checkout@v4
+
+      - name: Copy docker-compose.prod.yaml to Droplet
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.DROPLET_IP_ADDRESS }}
+          username: root
+          key: ${{ secrets.DROPLET_SSH_KEY }}
+          source: "docker-compose.prod.yaml"
+          target: "/root/docker-compose.yml"
+
+      - name: Restart application
+        uses: 2023-WS-ASE/workout-tracker/.github/workflows/docker-compose-restart.yml@main
