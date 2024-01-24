@@ -24,4 +24,4 @@ jobs:
 
   restart-application:
     needs: build-and-push-docker
-    uses: 2023-WS-ASE/workout-tracker/.github/workflows/docker-compose-restart.yml@main
+    uses: ASE-WS23-GruppeA/workout-tracker/.github/workflows/docker-compose-restart.yml@main
