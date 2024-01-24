@@ -2,6 +2,11 @@ name: Restart Services with Docker Compose
 
 on:
   workflow_call:
+    secrets:
+      DROPLET_IP_ADDRESS:
+        required: true
+      DROPLET_SSH_KEY:
+        required: true
 
 jobs:
   restart:
