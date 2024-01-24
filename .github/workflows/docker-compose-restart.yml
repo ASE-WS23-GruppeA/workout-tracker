@@ -2,17 +2,24 @@ name: Restart Services with Docker Compose
 
 on:
   workflow_call:
+    inputs:
+      ssh_host:
+        required: true
+        type: string
+      ssh_key:
+        required: true
+        type: string
 
 jobs:
   restart:
     runs-on: ubuntu-latest
     steps:
       - name: Restart Services
-        uses: appleboy/ssh-action@v1.0.3
+        uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.DROPLET_IP_ADDRESS }}
+          host: ${{ inputs.ssh_host }}
           username: root
-          key: ${{ secrets.DROPLET_SSH_KEY }}
+          key: ${{ inputs.ssh_key }}
           script: |
             docker compose -f docker-compose.prod.yaml down --remove-orphans
             docker compose -f docker-compose.prod.yaml up --pull always --detach
