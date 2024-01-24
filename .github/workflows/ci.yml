@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - '.github/workflows/ci.yml'
+      - '.github/workflows/docker-compose-restart.yml'
       - 'docker-compose.prod.yaml'
 
 jobs:
