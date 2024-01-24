@@ -23,5 +23,5 @@ jobs:
           target: "/root/docker-compose.yml"
 
   restart-application:
-    needs: build-and-push-docker
+    needs: copy-docker-compose
     uses: ASE-WS23-GruppeA/workout-tracker/.github/workflows/docker-compose-restart.yml@main
