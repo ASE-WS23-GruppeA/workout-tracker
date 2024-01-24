@@ -7,11 +7,13 @@ on:
         required: true
         type: string
       build_artifact_name:
-        required: true
+        required: false
         type: string
+        default: 'build_folder'
       build_artifact_path:
-        required: true
+        required: false
         type: string
+        default: 'build'
       docker_build_dockerfile_path:
         required: false
         type: string
