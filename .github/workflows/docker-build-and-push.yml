@@ -9,7 +9,7 @@ on:
       build_artifact_name:
         required: false
         type: string
-        default: 'build_folder'
+        default: 'build_artifact'
       build_artifact_path:
         required: false
         type: string
