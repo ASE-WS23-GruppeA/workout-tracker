@@ -9,7 +9,7 @@ services:
       POSTGRES_PASSWORD: wt
       POSTGRES_DB: wt_user_service
     volumes:
-      - ./microservices/user-service/init_scripts/01_ddl.sql:/docker-entrypoint-initdb.d/01_ddl.sql
+      - ./workout-tracker/microservices/user-service/init_scripts/01_ddl.sql:/docker-entrypoint-initdb.d/01_ddl.sql
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -q -U wt -d wt_user_service" ]
       interval: 5s
