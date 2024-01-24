@@ -20,7 +20,7 @@ jobs:
           username: root
           key: ${{ secrets.DROPLET_SSH_KEY }}
           source: "docker-compose.prod.yaml"
-          target: "/root/docker-compose.yml"
+          target: "/root"
 
   restart-application:
     needs: copy-docker-compose

@@ -14,5 +14,5 @@ jobs:
           username: root
           key: ${{ secrets.DROPLET_SSH_KEY }}
           script: |
-            docker compose down --remove-orphans
-            docker compose up --pull always --detach
+            docker compose -f docker-compose.prod.yaml down --remove-orphans
+            docker compose -f docker-compose.prod.yaml up --pull always --detach
