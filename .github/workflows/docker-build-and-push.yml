@@ -26,14 +26,16 @@ on:
         required: false
         type: string
         default: '.'
-      encoded_env_file:
+      add_env_file:
         required: false
-        type: string
-        default: ''
+        type: boolean
+        default: false
 
     secrets:
       DIGITALOCEAN_ACCESS_TOKEN:
         required: true
+      ENCODED_ENV_FILE:
+        required: false
 
 jobs:
   build-and-push-docker:
@@ -50,8 +52,8 @@ jobs:
           path: ${{ inputs.build_artifact_path }}
 
       - name: Decode and Create .env File
-        if: ${{ inputs.encoded_env_file != '' }}
-        run: echo ${{ inputs.encoded_env_file }} | base64 -d > .env
+        if: ${{ inputs.add_env_file }}
+        run: echo ${{ secrets.ENCODED_ENV_FILE }} | base64 -d > .env
 
       - name: Build Docker Image
         run: |
