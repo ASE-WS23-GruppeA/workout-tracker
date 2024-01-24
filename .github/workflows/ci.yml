@@ -26,6 +26,6 @@ jobs:
   restart-application:
     needs: copy-docker-compose
     uses: ASE-WS23-GruppeA/workout-tracker/.github/workflows/docker-compose-restart.yml@main
-    with:
-      ssh_host: ${{ secrets.DROPLET_IP_ADDRESS }}
-      ssh_key: ${{ secrets.DROPLET_SSH_KEY }}
+    secrets:
+      DROPLET_IP_ADDRESS: ${{ secrets.DROPLET_IP_ADDRESS }}
+      DROPLET_SSH_KEY: ${{ secrets.DROPLET_SSH_KEY }}
