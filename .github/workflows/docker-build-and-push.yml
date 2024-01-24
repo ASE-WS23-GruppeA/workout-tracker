@@ -26,6 +26,11 @@ on:
         required: false
         type: string
         default: '.'
+      encoded_env_file:
+        required: false
+        type: string
+        default: ''
+
     secrets:
       DIGITALOCEAN_ACCESS_TOKEN:
         required: true
@@ -43,6 +48,10 @@ jobs:
         with:
           name: ${{ inputs.build_artifact_name }}
           path: ${{ inputs.build_artifact_path }}
+
+      - name: Decode and Create .env File
+        if: ${{ inputs.encoded_env_file != '' }}
+        run: echo ${{ inputs.encoded_env_file }} | base64 -d > .env
 
       - name: Build Docker Image
         run: |
