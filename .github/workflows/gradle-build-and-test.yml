@@ -42,7 +42,7 @@ jobs:
           gradle-version: ${{ inputs.gradle_version }}
 
       - name: Execute Gradle build
-        run: ./gradlew clean build --scan
+        run: ./gradlew clean build
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
