@@ -24,5 +24,22 @@ git submodule foreach '
 echo "Updating submodules to the latest commit on their branches..."
 git submodule update --remote --recursive
 
+# List of microservices and their respective directories
+microservices=("microservices/user-service" "microservices/workout-service" "microservices/exercise-service")
+
+# Check for .env file in each microservice directory and copy example.env if .env is missing
+for service in "${microservices[@]}"; do
+  if [ -f "$service/.env" ]; then
+    echo ".env file already exists in $service. Skipping..."
+  else
+    if [ -f "$service/example.env" ]; then
+      echo "Copying example.env to .env in $service..."
+      cp "$service/example.env" "$service/.env"
+    else
+      echo "No example.env file found in $service. Skipping..."
+    fi
+  fi
+done
+
 echo "All submodules initialized, updated, and set to track their respective branches."
 
