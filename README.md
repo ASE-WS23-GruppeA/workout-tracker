@@ -37,7 +37,7 @@ file. It covers everything from microservices, database strategies, API contract
 
 ## Installation
 
-Detailed installation steps are coming soon. Stay tuned!
+Clone the repository and execute the `submodules.sh` script.
 
 ## License
 
