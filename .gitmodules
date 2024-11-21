@@ -18,6 +18,10 @@
 	path = microservices/workout-service
 	url = https://github.com/ASE-WS23-GruppeA/workout-service
 	branch = main
+[submodule "microservices/workout-service-java"]
+  path = microservices/workout-service-java
+  url = https://github.com/ASE-WS23-GruppeA/workout-service-java
+  branch = main
 [submodule "microservices/authorization-server"]
 	path = microservices/authorization-server
 	url = https://github.com/ASE-WS23-GruppeA/authorization-server
